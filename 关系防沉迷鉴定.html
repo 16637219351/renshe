@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>关系防沉迷鉴定：你的出厂设置代码</title>
+<style>
+  :root{
+    --pink:#fbafaf;
+    --apricot:#f2c6b4;
+    --cream:#f3e8cb;
+    --blue:#99e1e5;
+    --ink:#5b4640;
+    --ink-soft:#8a736b;
+    --card:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#fdf6ec;
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+    font-size:17px;
+    line-height:1.7;
+  }
+  [hidden]{display:none !important;}
+  .wrap{max-width:480px;margin:0 auto;padding:28px 20px 56px;position:relative;}
+  .sparkle{position:absolute;user-select:none;pointer-events:none;opacity:.85;}
+
+  /* ---------- 首页 ---------- */
+  .home-head{text-align:center;padding:26px 0 10px;}
+  .home-badge{
+    display:inline-block;background:var(--blue);color:#3f5557;
+    border-radius:999px;padding:4px 16px;font-size:14px;letter-spacing:2px;margin-bottom:16px;
+  }
+  h1{font-size:34px;line-height:1.3;margin:0 0 6px;letter-spacing:2px;}
+  h1 .hl{color:#e08080;}
+  .home-sub{font-size:16px;color:var(--ink-soft);margin:0 0 26px;}
+  .intro{
+    background:var(--card);border-radius:20px;padding:16px 20px;font-size:15.5px;
+    color:var(--ink-soft);box-shadow:0 6px 18px rgba(91,70,64,.08);margin-bottom:26px;
+  }
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;}
+  .info-card{
+    border-radius:20px;padding:18px 16px;font-size:15px;line-height:1.55;
+    box-shadow:0 6px 14px rgba(91,70,64,.08);
+  }
+  .info-card .ico{font-size:22px;display:block;margin-bottom:6px;}
+  .c-pink{background:var(--pink);}
+  .c-apricot{background:var(--apricot);}
+  .c-cream{background:var(--cream);}
+  .c-blue{background:var(--blue);}
+  .btn-start{
+    display:block;width:100%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--pink),#f7c6c6);
+    color:#7c3f3f;font-size:21px;font-weight:700;letter-spacing:3px;
+    padding:17px 0;border-radius:999px;
+    box-shadow:0 10px 22px rgba(224,128,128,.35);
+    transition:transform .15s ease;
+  }
+  .btn-start:active{transform:scale(.97);}
+  .btn-start:focus-visible{outline:3px solid var(--blue);outline-offset:3px;}
+
+  /* ---------- 答题 ---------- */
+  .quiz-top{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+  .quiz-count{font-size:14px;color:var(--ink-soft);white-space:nowrap;}
+  .progress{flex:1;height:10px;border-radius:999px;background:#fff;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(91,70,64,.08);}
+  .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--pink));border-radius:999px;transition:width .3s ease;}
+  .q-card{
+    background:var(--card);border-radius:22px;padding:22px 20px;
+    box-shadow:0 8px 20px rgba(91,70,64,.08);margin-bottom:20px;
+  }
+  .q-no{
+    display:inline-block;background:var(--apricot);color:#7a5340;border-radius:10px;
+    font-size:13.5px;padding:2px 12px;margin-bottom:10px;letter-spacing:1px;
+  }
+  .q-text{font-size:17.5px;font-weight:600;line-height:1.65;margin:0;}
+  .opts{display:flex;flex-direction:column;gap:13px;}
+  .opt{
+    border:none;border-radius:18px;padding:15px 16px 15px 18px;
+    font-size:16px;line-height:1.6;text-align:left;color:var(--ink);cursor:pointer;
+    font-family:inherit;box-shadow:0 5px 14px rgba(91,70,64,.10);
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .opt:hover{transform:translateY(-2px);}
+  .opt:focus-visible{outline:3px solid var(--ink);outline-offset:2px;}
+  .opt .tag{
+    display:inline-block;font-size:13px;font-weight:700;margin-right:8px;
+    width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;
+    background:rgba(255,255,255,.75);color:var(--ink);
+  }
+  .opt.picked{transform:scale(.97);box-shadow:inset 0 0 0 2.5px var(--ink),0 5px 14px rgba(91,70,64,.10);}
+
+  .back-row{text-align:center;margin-top:18px;}
+  .back-btn{
+    border:none;background:transparent;color:var(--ink-soft);cursor:pointer;
+    font-size:15px;font-family:inherit;padding:10px 22px;border-radius:999px;
+  }
+  .back-btn:hover{background:rgba(255,255,255,.8);color:var(--ink);}
+  .back-btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px;}
+
+  /* ---------- 结果 ---------- */
+  .result-head{text-align:center;margin-bottom:8px;}
+  .result-emoji{font-size:52px;display:block;}
+  .camp{font-size:14px;letter-spacing:2px;color:var(--ink-soft);margin:8px 0 0;}
+  .camp-slogan{font-size:15px;color:var(--ink-soft);margin:4px 0 0;}
+  .variant-name{font-size:28px;margin:10px 0 14px;}
+  .code-badge{
+    display:inline-block;background:var(--blue);color:#33555a;border-radius:12px;
+    padding:6px 18px;font-size:15px;font-weight:700;letter-spacing:2px;margin-bottom:14px;
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px;}
+  .tag-chip{background:var(--cream);border-radius:999px;padding:4px 14px;font-size:13.5px;}
+  .r-card{border-radius:20px;padding:18px 18px;margin-bottom:16px;box-shadow:0 6px 16px rgba(91,70,64,.08);}
+  .r-card h3{margin:0 0 8px;font-size:17px;}
+  .r-card p{margin:0;font-size:15.5px;line-height:1.8;}
+  .result-foot{text-align:center;font-size:13.5px;color:var(--ink-soft);margin-top:26px;}
+
+  /* ---------- 动画 ---------- */
+  @keyframes fadein{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+  .anim{animation:fadein .35s ease both;}
+  @media (prefers-reduced-motion: reduce){
+    .anim{animation:none !important;}
+    .opt,.btn-start{transition:none !important;}
+  }
+  @media (max-width:390px){
+    h1{font-size:28px;}
+    .cards{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body data-visualization-style="lifestyle-consumption">
+
+
+<div class="wrap">
+
+  <!-- 首页 -->
+  <section id="home">
+    <svg class="sparkle" style="top:6px;left:8px" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 14 L32 17 L20 20 L17 32 L14 20 L2 17 L14 14 Z" fill="#99e1e5"/></svg>
+    <svg class="sparkle" style="top:60px;right:14px" width="24" height="24" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 14 L32 17 L20 20 L17 32 L14 20 L2 17 L14 14 Z" fill="#fbafaf"/></svg>
+    <svg class="sparkle" style="bottom:150px;left:2px" width="20" height="20" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 14 L32 17 L20 20 L17 32 L14 20 L2 17 L14 14 Z" fill="#f2c6b4"/></svg>
+
+    <div class="home-head">
+      <span class="home-badge">人类关系观察局</span>
+      <h1>关系<span class="hl">防沉迷</span>鉴定：<br>你的出厂设置代码</h1>
+      <p class="home-sub">18 道场景题 · 约 3-5 分钟</p>
+    </div>
+
+    <p class="intro">
+      本测试不测智商，不测情商，只测你在这个充满社交刺客的世界里，是怎么“苟”到现在的。请放下防备，按你最真实的直觉来～
+    </p>
+
+    <div class="cards">
+      <div class="info-card c-blue"><span class="ico">⏱️</span>预计耗时 3-5 分钟，随手就能答完</div>
+      <div class="info-card c-pink"><span class="ico">💬</span>18 道真实到脚趾抠地的日常场景</div>
+      <div class="info-card c-apricot"><span class="ico">🤫</span>没有标准答案，按第一直觉选就好</div>
+      <div class="info-card c-cream"><span class="ico">🧬</span>答完解锁你的专属出厂设置代码</div>
+    </div>
+
+    <button class="btn-start" id="startBtn">开始鉴定 →</button>
+  </section>
+
+  <!-- 答题 -->
+  <section id="quiz" hidden>
+    <div class="quiz-top">
+      <span class="quiz-count" id="quizCount">第 1 / 18 题</span>
+      <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+    </div>
+    <div class="q-card anim" id="qCard">
+      <span class="q-no" id="qNo">场景 01</span>
+      <p class="q-text" id="qText"></p>
+    </div>
+    <div class="opts anim" id="opts"></div>
+    <div class="back-row">
+      <button class="back-btn" id="backBtn" hidden>← 上一题</button>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section id="result" hidden>
+    <div class="result-head">
+      <span class="result-emoji" id="rEmoji"></span>
+      <p class="camp" id="rCamp"></p>
+      <p class="camp-slogan" id="rSlogan"></p>
+      <h2 class="variant-name" id="rName"></h2>
+      <div class="code-badge" id="rCode"></div>
+      <div class="tags" id="rTags"></div>
+    </div>
+    <div class="r-card c-pink anim"><h3>🌟 你的高光时刻</h3><p id="rHigh"></p></div>
+    <div class="r-card c-apricot anim" style="animation-delay:.08s"><h3>🕳️ 你的社交漏电点</h3><p id="rLeak"></p></div>
+    <div class="r-card c-blue anim" style="animation-delay:.16s"><h3>🩹 专属情绪创可贴</h3><p id="rBand"></p></div>
+    <p class="result-foot">本结果纯属娱乐 · 人类关系观察局温馨提示：关系虽好，可不要贪杯哦</p>
+  </section>
+
+</div>
+
+<script>
+/* ================= 题目数据 ================= */
+const QUESTIONS = [
+  { q:"周六晚上十一点，你刚洗完澡准备躺尸。死党突然连发三条微信：“啊啊啊”“我跟你说个事”“你千万别告诉别人”。你的第一反应：",
+    o:["直接打语音过去：“细说，我今晚不睡了，吃瓜第一线。”","捏着眉心回：“你最好是有什么正经事，我明天还要早起。”","已读，放下手机。心里默念：千万别是借钱，明早再回。","发个狗头表情包：“长话短说，我只有五分钟耐心。”"] },
+  { q:"朋友给你发了一张他刚拍的自拍，角度清奇，有点丑但很搞笑。你的回复是：",
+    o:["直接保存并做成表情包，反手就发回给他。","狂笑三分钟，然后回：“好看，下次别拍了。”","回了三个字：“哈哈哈哈。”","假装没看到，过十分钟再回一个无关的话题。"] },
+  { q:"朋友约你周末逛街，你已经连续上了六天班，现在的你只想死在家里。你的话术是：",
+    o:["“好啊好啊，去哪？我随时可以！”","“我这周末有点事，下次一定哈。”","“要不你来我家吧，我下厨，吃完咱俩一起躺尸。”","直接回：“不想动，别逼我求你放过我。”"] },
+  { q:"你被拉进了一个完全不熟的群，比如同事群、亲戚群，群里每天都在发毫无营养的表情包。你会：",
+    o:["积极融入，把群备注改成“相亲相爱一家人之我最好看版”。","默默把群设置为消息免打扰，偶尔点开爬个楼。","直接退群，或者只回“收到”，多一个字算我输。","暗中观察群里的八卦，但绝对不接话。"] },
+  { q:"你在朋友圈发了一条精心编辑、略带emo的文案，结果半小时过去，没人点赞。你会：",
+    o:["无所谓，我发我的，你们看不看关我屁事。","觉得有点尴尬，过一会儿默默把它设为仅自己可见。","跑去看别人的朋友圈，挨个点赞，试图换几个赞回来。","直接再发一句：“怎么，都瞎了吗？”"] },
+  { q:"伴侣或好朋友今天被老板骂了，回来跟你疯狂吐槽了半个小时。你听完的感受和动作是：",
+    o:["跟着一起骂老板，顺便帮他写好辞职信和劳动仲裁申请。","一边递纸巾一边走神，心想他好惨，但我好累。","听完抱抱他：“去洗个澡吧，我给你点个外卖。”然后迅速结束对话。","直接说：“别哭了，明天我带你去吃顿好的，化悲愤为食欲。”"] },
+  { q:"你发现好朋友最近回你消息越来越慢，经常隔半天才回。你的反应是：",
+    o:["他肯定在忙，无所谓，我也有自己的生活。","心里开始演八十集连续剧：我是不是说错话了？他是不是烦我了？","故意也隔半天再回，或者撤回一条消息，看看他什么反应。","直接去问：“你最近是不是有什么心事？还是对我有意见？”"] },
+  { q:"深夜十二点，你突然emo了，心里堵得慌，特别想找人说说话。你会：",
+    o:["随便抓一个还没睡的朋友，狂发语音轰炸，不管对方死活。","点开对话框，打字又删除，最后发个仅自己可见的朋友圈。","发个网易云音乐链接到朋友圈，配文：“有人没睡吗？”","默默打开游戏，或者点个炸鸡，安慰自己说情绪哪有炸鸡香。"] },
+  { q:"你遇到了一件很棘手的事情，有个朋友主动提出来说：“要不要我帮忙？”你的第一反应是：",
+    o:["感动得痛哭流涕，顺势把自己所有的委屈都倒出来。","连连摆手：“不用不用，我自己能搞定，你忙你的。”","犹豫了一下，说：“那你能帮我做B部分吗？A我自己来。”","开玩笑说：“好啊，你顺便帮我把钱也付了吧。”"] },
+  { q:"朋友在你面前吐槽另一个你不太熟的人，越骂越难听。你会：",
+    o:["跟着一起附和：“就是就是，我早看他不顺眼了。”","默默听着，偶尔点个头，但不发表实质性意见。","试图客观地帮那个人说句话：“其实他也还好吧……”","心里很不耐烦，直接转移话题：“不说他了，你看那个新剧没？”"] },
+  { q:"你和对象或死党吵架了，处于冷战状态。你半夜躺在床上，一般在干嘛？",
+    o:["手机不离手，等着对方先发消息，一直等到手机砸脸。","疯狂翻看之前的聊天记录，复盘到底是谁的错，越翻越睡不着。","早就睡了，爱咋咋地，明天再说。","实在憋不住，发一句：“你饿不饿？我点了烧烤。”"] },
+  { q:"对方放了你鸽子，理由是临时有点事，害你一个人在大街上吹了半小时冷风。你的处理方式是：",
+    o:["表面说没事，你忙你的，转头在小群里骂了半小时。","直接语音打过去：“什么事啊？不严重的话你得请我吃顿好的补偿我！”","取消置顶星标，撤回两条分享欲，默默在心里扣了二十分。","立刻转身自己去吃顿好的，并且发朋友圈仅他可见：一个人也要好好吃饭。"] },
+  { q:"对方跟你道了歉，但你心里其实还没原谅他，你会怎么做？",
+    o:["嘴上说没关系，但接下来的三天说话依然阴阳怪气。","直接说：“我原谅你了，但我现在心情还是不好，给我点时间。”","只要道了歉，这事儿就翻篇了，我甚至还会反思自己是不是太小气。","表面翻篇，但这事儿会在我的小本本上被记一辈子。"] },
+  { q:"你和人起冲突，对方突然拔高音量，大声吼你。你的反应是：",
+    o:["瞬间大脑空白，眼泪不受控制地往下掉，一句话说不出来。","吼回去，气势上绝对不能输，谁怕谁啊。","直接闭嘴，冷脸看着他，等他吼完，转身走人。","突然觉得很好笑，这人破防了哎。"] },
+  { q:"你喜欢的人或伴侣晚上十一点半发来一句：“今天有点累。”没下文了。你表面和内心更像：",
+    o:["直接问：“累什么？工作还是心情？要不要打个电话？”","回：“那早点休息。”内心却想：他是不是想我了？我这样回是不是太冷淡了？","先回个抱抱，然后切回自己的游戏或剧，觉得成年人自己消化就好。","回：“懂了，那我给你点了杯奶茶，放门口了。”"] },
+  { q:"刚确认关系的第二天，对方提出想把你介绍给他的所有兄弟或闺蜜认识。你的第一反应：",
+    o:["太好了，我也想秀恩爱，社交悍匪申请出战！","有点开心，但也有点社恐，能不能只吃个便饭，别搞太大阵仗？","内心警铃大作，太快了吧，我还没准备好进入你的社交圈。","直接拒绝：“不了吧，我怕他们跟我抢你。”"] },
+  { q:"伴侣或暧昧对象想看你手机，或者问你要各种APP的密码。你会：",
+    o:["随便看，我手机里全是猫猫和你的照片，毫无秘密。","嘴上说凭什么，但还是会给他看，怕他不高兴。","坚决不行，这是我的个人领地，互看手机会让我非常没有安全感。","给他看，但事先说明：“你要是翻出什么，今晚就别睡了。”"] },
+  { q:"彩蛋题：如果非要给你的关系处理能力选一个动物代言，你会选：",
+    o:["狗子。谁对我好我就跟谁走，主打一个热情忠诚。","猫。你别烦我，我想搭理你的时候自然会过来。","刺猬。靠得太近会被扎，但里面软得很。","变色龙。对方什么态度，我就什么态度，主打一个防守反击。"] }
+];
+
+/* ================= 人格结果 ================= */
+const RESULTS = {
+  camps:{
+    c1:{emoji:"🛳️",name:"赛博空间潜水艇",slogan:"主打一个：不联系，就是感情还在。"},
+    c2:{emoji:"🎮",name:"情绪单机玩家",slogan:"主打一个：自己扛，别管我。"},
+    c3:{emoji:"🪙",name:"人间全自动许愿池",slogan:"主打一个：对你好，但我委屈。"},
+    c4:{emoji:"🎧",name:"关系外包客服",slogan:"主打一个：对外热情，对内耗电。"},
+    c5:{emoji:"🦅",name:"薛定谔的社交悍匪",slogan:"主打一个：又菜又爱玩，发疯又认怂。"}
+  },
+  list:{
+    1:{camp:"c1",name:"已读乱回版",code:"Y-H-R-H - 404",tags:["聊天届的糊弄学大师","意念回复流掌门人"],
+      high:"你极其擅长情绪稳定地敷衍。朋友发来长篇大论的吐槽小作文，你用一套抱抱、哈哈哈哈、绝了的连招，外加几个小狗表情包，就能完美安抚对方，绝不让自己卷入烂摊子。你简直是社交场上的太极宗师，四两拨千斤。",
+      leak:"最烦夺命连环问和60秒语音方阵。一旦有人在微信上问你在吗，你的大脑就会拉响防空警报，甚至想连夜把手机恢复出厂设置。你的乱回不是没礼貌，纯属是系统内存不足，自动降级处理了。",
+      band:"别心虚！哪怕你只回了一个嗯，但你确实是看了，也尽力回了。成年人的友谊，不需要天天发小作文，一句哈哈哈哈已经是我对你最高级别的认可了。放心吧，真朋友连你放的屁都懂，不懂的早被你气跑了。"},
+    2:{camp:"c1",name:"间歇性诈尸版",code:"J-X-Z-S - 233",tags:["午夜凶铃本铃","薛定谔的分享欲"],
+      high:"你的社交状态极其省电。平时在群里仿佛查无此人，连朋友圈都三天可见。但只要半夜两点你突然刷到一个搞笑视频，或者吃了一顿极度难吃的外卖，你就会立刻满血复活，疯狂艾特你的怨种朋友，让他快看快吃瓜。",
+      leak:"最讨厌日常打卡式聊天。什么早安午安晚安，什么你今天吃了啥，对你来说堪比酷刑。对方如果太黏人，你的第一反应就是这人是闲出屁了吗，然后瞬间下沉，继续潜伏。",
+      band:"有人觉得你忽冷忽热，这就对了！你得知道，潜艇是不能天天浮在水面上的，会被晒干的。你们的关系就像定期存款，平时不用管，年底一取，利息还挺高。理直气壮地诈尸吧！"},
+    3:{camp:"c2",name:"拔网线装死版",code:"B-W-X - 000",tags:["现实版鸵鸟","逃避可耻但极其有用"],
+      high:"你绝对是个狠人。别人失恋哭天抢地，你失恋只会哦一声然后去洗澡。你有着超强的自我消化能力，遇到破事第一反应就是闭嘴。你的世界里没有救救我，只有放着我来你们别烦我就行，特别省心。",
+      leak:"冲突一旦发生，你的最高指令就是敌进我退，敌驻我扰，敌疲我打……不对，敌进我直接拔网线！只要有人拉着你把话说清楚，你就会立刻开启物理消失模式。只要我不回应，尴尬的就是别人。",
+      band:"别人说你回避型人格，别理他们。拔网线是你保护自己情绪的最后一道防线，没经历过你那些糟心事的人，凭什么让你敞开心扉？给自己一点时间慢慢回血，等你有电了，再自己插上电源，多大点事儿。"},
+    4:{camp:"c2",name:"系统崩溃版",code:"X-T-B-K - 999",tags:["表面稳如老狗","内心毁灭地球"],
+      high:"你拥有极致的体面。哪怕心里已经把老板、对象或甲方骂了一万遍，你的脸上依然能维持着好的收到这种迷人微笑。你朋友圈里岁月静好，实际上你的内心剧场正在上演狂飙续集。",
+      leak:"最怕那种没眼力见的人问你是不是不高兴啊。你内心只想大喊，我高不高兴你看不出来吗，快别问了，再问我就真的憋不住了！一旦委屈攒够，你的崩溃往往毫无征兆，上一秒笑嘻嘻，下一秒直接关机。",
+      band:"别老自己扛着了，长按电源键还可以强制重启呢，你凭啥不能发疯？以后遇到烂人烂事，允许自己卡顿一下，掉几滴眼泪。系统崩溃不丢人，反正只要重启，你还是一条好汉。"},
+    5:{camp:"c3",name:"售后三包版",code:"S-H-S-B - 24/7",tags:["免费情绪价值批发商","全员的大爹或亲妈"],
+      high:"朋友一emo，你立刻化身心理咨询师、情感调解员和外卖投喂机。你甚至能在朋友骂前男友时，递上精准的词汇，帮他把对方骂得体无完肤。别人跟你做朋友，简直是祖坟冒青烟，花一分钱，享受VIP全套服务。",
+      leak:"极度讨厌白嫖和白眼狼。你可以付出，但如果对方把你的好当成理所当然，你内心会非常委屈。最气人的是，你明明白天在心里发誓我再管他我就是狗，晚上人家一发朋友圈，你又去评论怎么了宝。",
+      band:"收起你那泛滥的母爱或父爱吧！你的好很贵，必须给那种懂得双向奔赴的人。下次如果真不想理，可以直接发个收款码，备注咨询费一次50，微信还是支付宝，治治他们的白嫖病！"},
+    6:{camp:"c3",name:"记仇小本本版",code:"J-C-B-B - 888",tags:["暗杀名单终身VIP用户","面带微笑的复仇者"],
+      high:"你表面云淡风轻，其实内心堪比监控摄像头。对方哪年哪月哪日哪句话让你不爽了，你记得清清楚楚，连标点符号都没忘。但你不说，你依然笑眯眯地和他做朋友，这不叫虚伪，这叫战略性耐心。",
+      leak:"最恨不长记性和得寸进尺。你的底线是一点点往后退的，但一旦退到悬崖边，对方还在踩，你的小本本就会啪地合上，直接给这段关系判死刑，并且让对方死得不明不白。",
+      band:"记仇怎么了？记仇说明你心思细腻！你要是真不在乎，连他姓什么你都会忘。不过为了你的乳腺健康，下次咱别记本子上了，直接当面阴阳他几句，让他当场破防，你爽了就翻篇！"},
+    7:{camp:"c4",name:"自动回复版",code:"Z-D-H-F - 886",tags:["人机交互天花板","互联网糊弄学博士"],
+      high:"你是最好的倾听者。哪怕你此刻正在抠脚、看剧或者在拉屎，只要对方发来消息，你都能立刻切回职业客服状态，连续输出天呐、真的假的、太过分了，情绪价值拉满，连淘宝客服看了你的回复都要自愧不如。",
+      leak:"最怕别人突然问一句你刚才是不是没仔细听我说话。你的内心会狂飙冷汗，我都回了你半小时了，你还要我怎样？你极其讨厌那些需要动脑子去深度共情的长篇大论。",
+      band:"每天陪聊也是很累的！你不需要永远当那个捧场王。以后再有人疯狂倒苦水，直接祭出大招：“哎呀，我这边突然有点急事、老板找、外卖到了，回头聊哈！”理直气壮地跑路，你又不是真客服，没拿工资！"},
+    8:{camp:"c4",name:"拒绝服务版",code:"J-J-F-W - 403",tags:["行走的莫挨老子","社交安检仪"],
+      high:"你的边界感极其舒适。谁要是敢跟你开那种没分寸的玩笑，或者跟你搞道德绑架，你不仅不会顺从，还会当场用三句话把对方怼到怀疑人生。你是公认的社交场上的反PUA大师，谁也别想占你便宜。",
+      leak:"最烦别人不拿自己当外人。比如刚认识没两天的同事就跟你打听工资，或者不熟的亲戚对你催婚。这时候你的防御系统会瞬间启动，直接把对方拉入冷宫。",
+      band:"干得漂亮！这年头，发疯是保护自己最好的武器。那些说你脾气怪的人，其实就是占不到你便宜的人。保持你的冷漠，把你的热情留给那几个你真在乎的VIP客户就行了。"},
+    9:{camp:"c5",name:"嘴强王者版",code:"Z-Q-W-Z - 666",tags:["键盘上的战神","现实中的小怂包"],
+      high:"线上重拳出击，线下唯唯诺诺。朋友被欺负了，你在微信上化身键盘侠，教他怎么反击，逻辑严密、金句频出。如果真有最佳网友奖，你绝对是冠军。只要有你在，群里的气氛永远冷不了。",
+      leak:"最怕线下碰一碰。对方如果在微信上说电话里说或者咱们见面聊，你就会立刻石化，心里想着要不还是打字吧？一旦当面起冲突，你的气势会瞬间矮半截，光速认怂。",
+      band:"这叫战术性保守！嘴上赢了也是赢了，谁规定一定要线下肉搏？反正咱们骨子里是个爱好和平的小可爱。下次线下要怂的时候，就默默告诉自己，我是靠脑子吃饭的。"},
+    10:{camp:"c5",name:"随时发疯版",code:"S-S-F-F - 555",tags:["当代反内耗代表","只要我没素质，快乐就属于我"],
+      high:"你绝不允许自己咽下任何一口恶气。别人阴阳你一句，你直接大声回怼，问他刚才说什么，没听清让他再说一遍。你从不精神内耗，只外耗别人。你的精神状态领先同龄人至少二十年。",
+      leak:"最烦冷暴力。如果对方敢跟你玩已读不回，或者那种我不说你自己悟的戏码，你会直接拉黑他，甚至还会发一条朋友圈精准点名，吐槽有些人真把自己当个东西了。",
+      band:"虽然发疯很爽，但也容易误伤友军哦。偶尔发疯是排毒，天天发疯容易掉血。在掀桌子之前，先看看对面的人是不是值得你浪费这个力气。留几个理智的开关，免得把自己的桃花和财运全吓跑了。"},
+    11:{camp:"c1",name:"全地形自适应伪人（隐藏彩蛋）",code:"W-R-W-R - 404404",tags:["百变马丁","人类高质量变色龙"],
+      high:"你是真正的社交六边形战士。跟社恐在一起，你安静如鸡；跟社牛在一起，你比他还能嗨。你能精准切换人格，融入任何圈子，且做到八面玲珑，身边的人都觉得你特别懂他。",
+      leak:"最怕半夜一个人复盘，心想我今天跟A说的那套话，是不是跟B说的完全相反？有时候你会觉得，自己就像个戴着面具的演员，面具太多了，连自己本来的样子都忘了。",
+      band:"别觉得委屈！见人说人话说明你情商极高，这不叫虚伪，这叫入乡随俗。只要咱心里有一杆秤，知道自己是好人就行了。实在累了，就找个借口窝在家里一天，哪副面具都不带，做个单纯的干饭机器。"}
+  }
+};
+RESULTS.camps.c1.__hidden = true; /* 隐藏款借用第一阵营的封面名，展示时用专属名 */
+
+/* ================= 计分 ================= */
+/* 计分规则：
+   D 居多 → 薛定谔的社交悍匪；A 居多 → 人间全自动许愿池 / 关系外包客服；
+   B、C 居多 → 赛博空间潜水艇 / 情绪单机玩家；A/B/C/D 极度均匀 → 隐藏彩蛋。 */
+function calc(answers){
+  const n = {A:0,B:0,C:0,D:0};
+  answers.forEach(a => n[a]++);
+  const vals = [n.A, n.B, n.C, n.D];
+  const max = Math.max.apply(null, vals);
+  const min = Math.min.apply(null, vals);
+  if (max - min <= 1) return 11;               /* 极度均匀 → 隐藏款 */
+  if (n.D === max) return n.A >= n.B ? 9 : 10; /* 悍匪：线上战神 vs 随时发疯 */
+  if (n.A === max) return n.C >= n.D ? (n.D >= n.B ? 6 : 5) : (n.D >= n.B ? 8 : 7); /* 许愿池/客服 */
+  /* B、C 居多 */
+  if (n.C === max) return n.D >= n.B ? 2 : 1;  /* 诈尸 vs 已读乱回 */
+  return n.A >= n.C ? 4 : 3;                   /* 系统崩溃 vs 拔网线 */
+}
+
+/* ================= 页面逻辑 ================= */
+const homeEl = document.getElementById('home');
+const quizEl = document.getElementById('quiz');
+const resultEl = document.getElementById('result');
+const qText = document.getElementById('qText');
+const qNo = document.getElementById('qNo');
+const qCard = document.getElementById('qCard');
+const optsEl = document.getElementById('opts');
+const bar = document.getElementById('bar');
+const quizCount = document.getElementById('quizCount');
+const OPT_COLORS = ['c-pink','c-apricot','c-cream','c-blue'];
+const LETTERS = ['A','B','C','D'];
+let current = 0;
+let answers = [];
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  homeEl.hidden = true;
+  quizEl.hidden = false;
+  window.scrollTo(0,0);
+  renderQuestion(0);
+});
+
+const backBtn = document.getElementById('backBtn');
+backBtn.addEventListener('click', () => {
+  if (current > 0) renderQuestion(current - 1);
+});
+
+function renderQuestion(i){
+  backBtn.hidden = (i === 0);
+  current = i;
+  const item = QUESTIONS[i];
+  quizCount.textContent = '第 ' + (i+1) + ' / ' + QUESTIONS.length + ' 题';
+  bar.style.width = (i / QUESTIONS.length * 100) + '%';
+  qNo.textContent = '场景 ' + String(i+1).padStart(2,'0');
+  qText.textContent = item.q;
+  optsEl.innerHTML = '';
+  item.o.forEach((text, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt anim ' + OPT_COLORS[idx];
+    btn.style.animationDelay = (idx * 0.05) + 's';
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = LETTERS[idx];
+    btn.appendChild(tag);
+    btn.appendChild(document.createTextNode(text));
+    btn.addEventListener('click', () => pick(idx, btn));
+    optsEl.appendChild(btn);
+  });
+  qCard.classList.remove('anim'); void qCard.offsetWidth; qCard.classList.add('anim');
+}
+
+function pick(idx, btn){
+  if (btn.classList.contains('picked')) return;
+  answers[current] = LETTERS[idx];
+  btn.classList.add('picked');
+  const delay = (current === QUESTIONS.length - 1) ? 420 : 360;
+  setTimeout(() => {
+    if (current === QUESTIONS.length - 1) {
+      showResult();
+    } else {
+      renderQuestion(current + 1);
+    }
+  }, delay);
+}
+
+function showResult(){
+  quizEl.hidden = true;
+  resultEl.hidden = false;
+  window.scrollTo(0,0);
+  bar.style.width = '100%';
+  const id = calc(answers);
+  const v = RESULTS.list[id];
+  const camp = RESULTS.camps[v.camp];
+  document.getElementById('rEmoji').textContent = (id === 11) ? '🥚' : camp.emoji;
+  document.getElementById('rCamp').textContent = (id === 11) ? '隐藏彩蛋 · 全地形自适应伪人' : '阵营：' + camp.name;
+  document.getElementById('rSlogan').textContent = camp.slogan;
+  document.getElementById('rName').textContent = (id === 11) ? '你触发隐藏款了！' : v.name;
+  document.getElementById('rCode').textContent = '出厂代码：' + v.code;
+  const tags = document.getElementById('rTags');
+  tags.innerHTML = '';
+  v.tags.forEach(t => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.textContent = t;
+    tags.appendChild(chip);
+  });
+  document.getElementById('rHigh').textContent = v.high;
+  document.getElementById('rLeak').textContent = v.leak;
+  document.getElementById('rBand').textContent = v.band;
+}
+
+</script>
+</body>
+</html>
